@@ -1,0 +1,6 @@
+type: beznodes
+patch: ../input/patches/patchPoints.txt
+spring_constant: 5
+node_count: 15, 13
+grid: 2, 2, 3
+z_height: 10.0

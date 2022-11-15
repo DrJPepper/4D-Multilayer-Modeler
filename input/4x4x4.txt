@@ -1,0 +1,6 @@
+type: node
+spring_constant: 5
+spacing: 35
+grid: 4, 4, 4
+angle: 0.5
+z_height: 25

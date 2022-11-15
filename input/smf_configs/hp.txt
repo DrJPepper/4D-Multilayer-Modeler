@@ -1,0 +1,17 @@
+ambient: 0.3, 0.3, 0.3
+Zv: 1.0, 0.0, 0.0
+Vup: 0.0, 1.0, 0.0
+image_x: 100
+image_y: 100
+
+# x, y, z, r, g, b
+light: 500.0, 0.0, 0.0, 0.5, 0.5, 0.5
+
+mesh: ../input/smfs/hp.smf
+    scale: 1.0
+    rotate: 0.0, -90.0, 90.0
+    color: 1.0, 1.0, 1.0
+    kd: 1.0
+    ks: 1.0
+    ka: 1.0
+    n: 30.0

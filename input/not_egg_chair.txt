@@ -1,0 +1,7 @@
+type: beznodes_auto
+patch: ../input/patches/patchPoints.txt
+grid: 2, 2, 3
+long_edge_node_count: 30
+max_shrinkage: 0.4
+z_height: 20.0
+curvature_p_value: 1.0

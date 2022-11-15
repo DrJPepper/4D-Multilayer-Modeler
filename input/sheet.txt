@@ -1,0 +1,7 @@
+type: sheet
+spring_constant: 5
+spacing: 35
+node_count: 5, 5
+grid: 4, 4, 4
+angle: 0.4, -0.4
+z_height: 25

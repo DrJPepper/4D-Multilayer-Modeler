@@ -1,0 +1,6 @@
+type: beznodes_multistep
+patch: ../input/patches/BezPatch0.txt
+spring_constant: 5
+node_count: 15, 13
+grid: 2, 2, 3
+z_height: 1.0

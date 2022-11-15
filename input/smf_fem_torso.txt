@@ -1,0 +1,12 @@
+type: smfnodes
+radius: 5
+model: ../input/smf_configs/fem_torso.txt
+long_edge_node_count: 10
+grid: 2, 2, 3
+z_height: 0.5
+max_shrinkage: 0.5
+# Bottom left
+ray_start: 51.0, 23.0
+# Up and right
+ray_box_size: 15.0, 15.0
+curvature_p_value: 1.0

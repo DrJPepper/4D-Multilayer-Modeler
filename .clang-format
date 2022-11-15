@@ -1,0 +1,13 @@
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# To disable for a line use `// clang-format off`
+BasedOnStyle: Google # https://google.github.io/styleguide/cppguide.html
+IndentPPDirectives: BeforeHash
+AlignTrailingComments: true
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+BreakBeforeBinaryOperators: false
+IndentWidth: 4
+#SortIncludes: false
+NamespaceIndentation: All
+IndentAccessModifiers: true

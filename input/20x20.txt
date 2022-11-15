@@ -1,0 +1,7 @@
+type: bezier
+spring_constant: 5
+grid: 20, 20, 2
+spacing: 35
+radius: 5
+z_height: 40
+patch: input/patchPoints.txt

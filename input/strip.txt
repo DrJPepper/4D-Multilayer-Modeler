@@ -1,0 +1,7 @@
+type: strip
+spring_constant: 5
+spacing: 35
+node_count: 1
+grid: 4, 4, 4
+angle: 1.25
+z_height: 25

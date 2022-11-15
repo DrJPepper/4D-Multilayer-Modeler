@@ -1,0 +1,16 @@
+type: smfnodes
+radius: 5
+model: ../input/smf_configs/hp.txt
+spring_constant: 35
+long_edge_node_count: 10
+grid: 2, 2, 3
+z_height: 3.0
+max_shrinkage: 0.4
+ray_start: 0.0, 0.0
+ray_box_size: 0.3156, 0.0123
+#ray_start: 25.0, 25.0
+#ray_box_size: 50.0, 50.0
+curvature_p_value: 1.0
+
+#0 0 0
+#1.54761 2.78781 4.36817

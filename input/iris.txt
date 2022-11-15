@@ -1,0 +1,7 @@
+type: beznodes_auto
+patch: ../input/patches/patchPointsIrisPetal2.txt
+grid: 2, 2, 4
+long_edge_node_count: 35
+max_shrinkage: 0.5
+z_height: 0.2
+curvature_p_value: 1.0
