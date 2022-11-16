@@ -1,5 +1,7 @@
 #pragma once
 
+// This file handles all imports and holds a few very generic functions
+
 #include <QtCore>
 #include <QtCore/QtGlobal>
 #include <QApplication>
@@ -89,9 +91,8 @@ Vector3d ratioToRGB(double ratio);
 double distance(MatrixXd one, MatrixXd two);
 double vectAngle(Vector3d one, Vector3d two);
 double pow2(double x);
-double addNoise(double original, double noiseMax);
-bool isDigits(char *, bool);
 json makeEntity(string type, float red, float green, float blue, string description, MatrixXd& position);
 
+// The master JSON logging object. It is global so that it can be added to from any class.
 static json jsOut;
 extern bool saveToJS;

@@ -5,6 +5,9 @@
 #include "./spline.h"
 #include "./util.h"
 
+// This class got pretty bloated, but it initially started as the "Gradient
+// Descent" class and handles most of the pipeline from input processing to
+// optimizing the grid
 class GradDesc {
     public:
         GradDesc();

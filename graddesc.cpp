@@ -11,15 +11,21 @@ GradDesc::GradDesc() {
     isSMFBool = false;
 }
 
+// Performs a second pass of ray tracing and data population following the
+// analysis pass that was done in populateSMFNodes
 void GradDesc::initNodeMatricesSMF() {
     double maxDist = 0.0;
     int shrinkage;
     double rayBox[4] = {uStart, vStart, uLength, vLength};
+    
+    // Get final ray tracing data
     auto rayTraceResults = rayTrace(inputFileName, vertices, faces, rayBox, node_count_v+1, node_count_u+1);
     MatrixXd intersectPointsNodes = std::get<2>(rayTraceResults);
     auto xPoints = std::get<0>(rayTraceResults);
     auto yPoints = std::get<1>(rayTraceResults);
 
+    // Populate the curvature and distance matrices that actually correspond to
+    // the requested node counts
     for (int z = 0; z < distanceU.rows(); z++) {
         MatrixXd splinePoints = intersectPointsNodes.block(z * xPoints, 0, xPoints, 3);
         MatrixXd tangents = MatrixXd::Zero(0, 3);
@@ -60,6 +66,7 @@ void GradDesc::populateSMFNodes() {
     double currDist;
     int shrinkage;
     double rayBox[4] = {uStart, vStart, uLength, vLength};
+    // Get ray tracing data with default u x v sizing for analysis
     auto rayTraceResults = rayTrace(inputFileName, vertices, faces, rayBox, 0, 0);
     intersectPoints = std::get<2>(rayTraceResults);
     auto xPoints = std::get<0>(rayTraceResults);
@@ -74,6 +81,8 @@ void GradDesc::populateSMFNodes() {
     distanceMax = Array2d::Zero(2);
     distanceMin = Array2d::Constant(numeric_limits<double>::max());
 
+    // Generates the splines from the ray tracing data and uses them to
+    // sample curvatures and distances
     for (int z = 0; z < yPoints; z++) {
         MatrixXd curvePoints = MatrixXd::Zero(sampleCount * (xPoints - 1), 3);
         MatrixXd splinePoints = intersectPoints.block(z * xPoints, 0, xPoints, 3);
@@ -181,6 +190,8 @@ void GradDesc::analyzeSurfaceBezier() {
     analyzeSurfaceGeneric();
 }
 
+// Calculates basically as much as possible about the grid based on an initial
+// analysis pass of either the SMF or Bezier input
 void GradDesc::analyzeSurfaceGeneric() {
     double linearMaxShrink = 1.0 - (distanceMin / distanceMax).minCoeff();
     sort(curvaturesVec.begin(), curvaturesVec.end());
@@ -242,6 +253,8 @@ void GradDesc::analyzeSurfaceGeneric() {
     // plotCurvHisto(curvUs);
 }
 
+// Can be called above to plot a histogram of the curvatures measured on the
+// input surface
 void GradDesc::plotCurvHisto(vector<double> &curvs) {
     vector<double> v = curvs;
     sort(v.begin(), v.end());
@@ -342,6 +355,8 @@ void GradDesc::populateSheetOfNodesBezierMS() {
     populateSheetOfNodesGeneric();
 }
 
+// Populates the L0 matrix and first layer of rest lengths based on
+// the values already put into the distance matrices
 void GradDesc::populateSheetOfNodesGeneric() {
     double L0X, L0Y;
 
@@ -371,6 +386,8 @@ void GradDesc::populateSheetOfNodesGeneric() {
             }
         }
     }
+    // Queue up function pointers to be called at the push of the continue
+    // button
     stringDeq.push_back("Run in plane optimization");
     void (GradDesc::*optFunc)() = &GradDesc::shapeOptimizeGrid;
     funDeq.push_back(optFunc);
@@ -380,6 +397,7 @@ void GradDesc::populateSheetOfNodesGeneric() {
     funDeq.push_back(optFunc);
 }
 
+// Generate all the Ln layer rest lengths
 void GradDesc::duplicateL0() {
     layers = static_cast<int>(positionsVec.size());
     int i, j, n;
@@ -396,13 +414,18 @@ void GradDesc::duplicateL0() {
 
     double angleX, angleY, kappaX, kappaY;
     int index;
+    // The indexing on all this is fairly complicated
     for (i = 0; i < distanceV.cols(); i++) {
         for (j = 0; j < distanceU.rows(); j++) {
+            // This check means we're doing something in U/X direction
             if (i < distanceU.cols() && j < distanceU.rows()) {
+                // Base layer
                 L0X = distanceU(j, i) * (node_u - 1);
+                // Signed curvature value, including in cutoff check
                 kappaX = ((curvatureU(j, i) > 0) - (curvatureU(j, i) < 0)) *
                          min(abs(curvatureU(j, i)), maxKappa);
                 RXmin = (layers - 1) * zHeight / maxShrinkage;
+                // Radius of curvature
                 if (kappaX == 0.0) {
                     RX = -1.0;
                     angleX = 0.0;
@@ -413,6 +436,7 @@ void GradDesc::duplicateL0() {
                              asin(L0X / 2.0 / RX) * 2.0;
                 }
             }
+            // V/Y direction
             if (j < distanceV.rows() && i < distanceV.cols()) {
                 L0Y = distanceV(j, i) * (node_v - 1);
                 kappaY = ((curvatureV(j, i) > 0) - (curvatureV(j, i) < 0)) *
@@ -428,6 +452,8 @@ void GradDesc::duplicateL0() {
                              asin(L0Y / 2.0 / RY) * 2.0;
                 }
             }
+            // Loop through every layer besides the first one and calculate the
+            // rest lengths
             for (n = 0; n < layers; n++) {
                 if (i < distanceU.cols() && j < distanceU.rows()) {
                     if (RX < 0.0)
@@ -590,6 +616,7 @@ void GradDesc::populateMatrices(ifstream *inFile) {
     }
 }
 
+// Small function to instantiate all the important matrices
 void GradDesc::initVectors() {
     MatrixXd *temp;
     distanceU = MatrixXd::Constant(uRows, vCols - 1, -1);
@@ -609,6 +636,7 @@ void GradDesc::initVectors() {
     }
 }
 
+// Updates all the VTK actors
 void GradDesc::updateVtkGrid(Scene &scene) {
     vtkSphereSource *currSphere;
     vtkLineSource *currLine;
@@ -671,6 +699,7 @@ double GradDesc::getRestV(int row, int col, int layer) {
     return (*rest_vVec[layer])(row, col);
 }
 
+// Returns how far linear and angular springs are from their rest lengths
 Array2d GradDesc::getAvgSpringDisp() {
     Vector3d currPt, otherPt, mVec, ldir, rdir, ddir, udir, zddir, zudir;
     Array2d disp;
@@ -800,6 +829,9 @@ Array2d GradDesc::getAvgSpringDisp() {
     return disp;
 }
 
+// Approximates an energy measurement for the system (was not reported on in the
+// paper since it started acting buggy and there are more intuitive ways to
+// quantitatively verify the results)
 double GradDesc::getSysEnergy() {
     Vector3d currPt, otherPt, ldir, rdir, ddir, udir, zddir, zudir;
     double energy;
@@ -962,13 +994,14 @@ MatrixXd GradDesc::getMiddleLayer() {
     return *positionsVec[index];
 }
 
+// Calculates the statistics reported in the paper (L0 error and Ln error)
 void GradDesc::assessResults() {
     Vector3d vec1, vec2, ptRight, ptDown, ptDiag, center, currPt, pt1, pt2;
     int row, col, i, countU, countV;
     MatrixXd positions = getMiddleLayer();
     int topBottomLayers[2] = {0, positionsVec.size()-1};
     bool right, down;
-    double uGoal/*, vGoal*/, uError, distUFin, distVFin, distUGoal,
+    double uGoal, uError, distUFin, distVFin, distUGoal,
            distVGoal, theta, kappa, L[2];
     double totalUError = 0.0, totalUErrorLn = 0.0;
     double totalUErrorCurv = 0.0;
@@ -1032,6 +1065,7 @@ bool GradDesc::isSMF() {
     return isSMFBool;
 }
 
+// Builds all the ShapeOp objects and runs the optimization
 void GradDesc::shapeOptimizeGrid(int iters) {
     bool left, right, up, down, zup, zdown;
     double currRest;

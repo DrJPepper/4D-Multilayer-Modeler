@@ -15,6 +15,7 @@ Widget::Widget(QWidget *parent, GradDesc *gdIn) : QWidget(parent), ui(new Ui::Wi
     triangulate = true;
     fullyDone = false;
 
+    // Set up all the VTK boilerplate
     backRenderer->SetBackground(colors->GetColor3d("Black").GetData());
 
     vtkSmartPointer<vtkGenericOpenGLRenderWindow> backWindow =
@@ -42,9 +43,12 @@ Widget::Widget(QWidget *parent, GradDesc *gdIn) : QWidget(parent), ui(new Ui::Wi
     }
 }
 
+// These are global for convenience with the clickCallbackFunction since it
+// cannot be a class instance method
 static vtkSmartPointer<vtkActor> lastActor = nullptr;
 static double lastColor[3];
 
+// Handles click inputs from the user
 void clickCallbackFunction(vtkObject* caller,
         long unsigned int eventId,
         void* clientData,
@@ -96,6 +100,7 @@ void clickCallbackFunction(vtkObject* caller,
     }
 }
 
+// Renders the VTK scene for the first ray tracing step when the input is an SMF
 void Widget::renderSMF() {
 
     vtkNew<vtkNamedColors> colors;
@@ -224,6 +229,7 @@ void Widget::renderSMF() {
     backRenderer->GetActiveCamera()->SetFocalPoint(centroid(0), centroid(1), centroid(2));
 }
 
+// Adds more layers to the grid scene after in plane optimization has terminated
 void Widget::addLayers() {
     int row, col, cols = gd->getCols(), rows = gd->getRows();
     double spacing = gd->getSpacing();
@@ -352,6 +358,7 @@ void Widget::addLayers() {
     layersDrawn = gd->getLayers();
 }
 
+// Calls ShapeOp
 void Widget::runShapeOp() {
     cout << "Initial System Energy: " << gd->getSysEnergy() << endl;
     Vector2d disps = gd->getAvgSpringDisp();
@@ -377,6 +384,8 @@ Widget::~Widget() {
     delete ui;
 }
 
+// The very final step of the GUI process where the middle layer of the grid is
+// tessellated for easier comparison to the input patch
 void Widget::triangulateGrid() {
     auto actors = backRenderer->GetActors();
     actors->InitTraversal();
@@ -442,6 +451,7 @@ void Widget::triangulateGrid() {
     backRenderer->GetRenderWindow()->Render();
 }
 
+// Calls from the queue of function pointers when the continue button is clicked
 void Widget::on_continueButton_clicked() {
     string isFinal;
     if (gd->isSMF() && !hasAddedLayers) {

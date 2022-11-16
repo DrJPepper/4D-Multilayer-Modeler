@@ -2,6 +2,9 @@
 
 #include "./util.h"
 
+// Basic calculations needed to get positional, distance and curvature
+// measurements
+
 void initialize(MatrixXd*, string);
 MatrixXd Q(MatrixXd *points, float u);
 MatrixXd QLoop(MatrixXd &points, int count);

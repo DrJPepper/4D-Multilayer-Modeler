@@ -3,6 +3,8 @@
 #include "./bezier.h"
 #include "./util.h"
 
+// Builds on bezier.h/cpp and extends those functions to the splines generated
+// for SMF models
 MatrixXd genSpline(MatrixXd &points, MatrixXd &tangents, int &shrinkage);
 MatrixXd initialize(MatrixXd &, MatrixXd *, float, int &shrinkage);
 void printIvFile(MatrixXd *, MatrixXd *);

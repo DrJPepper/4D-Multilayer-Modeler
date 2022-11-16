@@ -1,5 +1,6 @@
 #include "spline.h"
 
+// Takes the points that need intersected and returns the stitched spline
 MatrixXd genSpline(MatrixXd &points, MatrixXd &tangents, int &shrinkage) {
     int n = 10;
     float tension = 0.0;
@@ -14,6 +15,7 @@ MatrixXd genSpline(MatrixXd &points, MatrixXd &tangents, int &shrinkage) {
     return points;
 }
 
+// Blends the controls points together from one curve to the next
 void smoothPoints(MatrixXd &points, int index) {
     Vector3d zero(0, 0, 0);
     Vector3d p0, p1 = zero, p2 = zero;
@@ -66,13 +68,9 @@ MatrixXd initialize(MatrixXd &points, MatrixXd *tangents, float tension,
             if (counter != pointsNew.rows() - 1) counter--;
             end = counter;
             if (start == 0 && end == pointsNew.rows() - 1) {
-                // Not sure if this is a great solution but might work
                 shrinkage = points.rows();
                 return zero;
             } else if (start == 0) {
-                // I don't know why but if I assign this directly to
-                // pointsNew some of the elements get deleted. Some memory
-                // issue going on.
                 shrinkage += end + 1;
                 counter = -1;
                 MatrixXd tempTemp =

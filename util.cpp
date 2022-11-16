@@ -2,6 +2,8 @@
 
 bool saveToJS = false;
 
+// Converts a ratio (in the case of this project, a spring's rest length
+// vs its current length) to RGB values moving from red to green to blue
 Vector3d ratioToRGB(double ratio) {
     double cap = 0.2, green, other;
     double minCap = 1.0 - cap;
@@ -40,26 +42,8 @@ double pow2(double x) {
     return x * x;
 }
 
-double addNoise(double original, double noiseMax) {
-    double lower = original * (1.0 - noiseMax);
-    double upper = original * (1.0 + noiseMax);
-    random_device r;
-    uniform_real_distribution<double> unif(lower, upper);
-    default_random_engine re(r());
-    return unif(re);
-}
-
-// Check if arguments are valid numbers
-bool isDigits(char *str, bool countFloats) {
-    regex re;
-    if (countFloats) {
-        re = regex("[0-9]*(\\.[0-9]*)?");
-        return regex_match(str, re);
-    }
-    re = regex("[0-9]*");
-    return regex_match(str, re);
-}
-
+// A generic function that returns a JSON object in a form compatible with my
+// primitives visualizer program. This is used for debugging only.
 json makeEntity(string type, float red, float green, float blue, string description, MatrixXd& position) {
     json entity = {
         {"type", type},

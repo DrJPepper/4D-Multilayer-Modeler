@@ -2,6 +2,7 @@
 
 #include "util.h"
 
+// Basically just a struct to hold the VTK actors and souurces
 class Scene {
     public:
         Scene();

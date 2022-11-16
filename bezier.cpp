@@ -207,12 +207,14 @@ double curvature(Vector3d prime, Vector3d doublePrime) {
     return (prime.cross(doublePrime)).norm() / pow(prime.norm(), 3);
 }
 
+// Curvature from points including the direction of curvature as a sign
 double curvatureFromUSigned(MatrixXd *points, float u) {
     Vector3d prime = qPrime(points, u);
     Vector3d doublePrime = qDoublePrime(points, u);
     return ((doublePrime(0) > 0) - (doublePrime(0) < 0)) * curvature(prime, doublePrime);
 }
 
+// Curvature from points without directionality
 double curvatureFromU(MatrixXd *points, float u) {
     Vector3d prime = qPrime(points, u);
     Vector3d doublePrime = qDoublePrime(points, u);

@@ -18,6 +18,7 @@ struct VertexData {
     MatrixXd pt1;
 };
 
+// Handles everything related to the Qt window and rendering the scene
 class Widget : public QWidget {
         Q_OBJECT
     public:
