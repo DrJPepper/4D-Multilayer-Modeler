@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
     // Needed to ensure appropriate OpenGL context is created for VTK rendering.
     QSurfaceFormat::setDefaultFormat(QVTKOpenGLNativeWidget::defaultFormat());
 
+    // Pass things off to Qt
     QApplication a(argc, argv);
     gd = new GradDesc();
     gd->populateMatrices(&inFile);

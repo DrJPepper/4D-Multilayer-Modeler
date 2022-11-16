@@ -31,8 +31,6 @@ MatrixXd QLoop(MatrixXd &points, int count) {
         }
         result.row(w) = acc;
     }
-    //cout << result << endl;
-    //exit(0);
     return result;
 }
 
@@ -87,6 +85,7 @@ int kChoosei(int k, int i) {
     return factorial(k) / (factorial(i) * factorial(k - i));
 }
 
+// Converts a Bezier patch into a u x v point matrix
 MatrixXd genPatchMat(MatrixXd *points, int u, int v) {
     MatrixXd patch = MatrixXd::Zero(u * v, 3);
     float du, dv;
@@ -142,7 +141,6 @@ TEST_CASE("testing the dQdu function") {
     points << 0, 0, 0, 2, 0, 0, 4, 0, 0, 6, 0, 0, 0, 2, 0, 2, 2, 0, 4, 2, 0, 6,
         2, 0, 0, 4, 0, 2, 4, 0, 4, 4, 0, 6, 4, 0, 0, 6, 0, 2, 6, 0, 4, 6, 0, 6,
         6, 0;
-    // Question mark on these results?
     CHECK(dQdu(&points, 0.75, 0.25).transpose() == result.transpose());
 }
 
@@ -204,6 +202,7 @@ TEST_CASE("testing the qDoublePrime function") {
     CHECK(qDoublePrime(&points, 0.75).transpose() == result.transpose());
 }
 
+// Actual direct curvature calculation
 double curvature(Vector3d prime, Vector3d doublePrime) {
     return (prime.cross(doublePrime)).norm() / pow(prime.norm(), 3);
 }
