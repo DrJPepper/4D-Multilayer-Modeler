@@ -407,7 +407,7 @@ void GradDesc::duplicateL0() {
                 positionsVec[0]->row(i)(1), n * zHeight;
         }
     }
-    double L0X, L0Y, maxCurvShrinkage = 0.0;;
+    double L0X, L0Y, maxCurvShrinkage = 0.0;
     double LnX, RX, RXmin;
     double LnY, RY, RYmin;
     radius = spacing / node_count_u;
