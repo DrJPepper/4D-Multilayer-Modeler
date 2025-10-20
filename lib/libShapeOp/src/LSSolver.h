@@ -14,8 +14,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include "Types.h"
 
-#include <iostream>
-#include <unsupported/Eigen/src/IterativeSolvers/MINRES.h>
+#include <unsupported/Eigen/IterativeSolvers>
 ///////////////////////////////////////////////////////////////////////////////
 /** \file
 This file contains all the linear system solvers of the ShapeOp library.*/

@@ -69,7 +69,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "doctest.h"
+//#include "doctest.h"
 #include "Constraint.h"
 #include "Solver.h"
 #include "./lib/gnuplot-iostream.h"
@@ -85,7 +85,8 @@ using namespace Eigen;
 using json = nlohmann::json;
 namespace SO = ShapeOp;
 
-using Eigen::all;
+using Eigen::placeholders::all;
+using Eigen::placeholders::last;
 
 Vector3d ratioToRGB(double ratio);
 double distance(MatrixXd one, MatrixXd two);

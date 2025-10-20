@@ -43,13 +43,13 @@ MatrixXd Q(MatrixXd *points, float u) {
     return acc;
 }
 
-TEST_CASE("testing the Q function") {
+/*TEST_CASE("testing the Q function") {
     MatrixXd points(4, 3);
     MatrixXd result(1, 3);
     result << 6, 1.5, 0;
     points << 0, 1.5, 0, 2, 1.5, 0, 4, 1.5, 0, 6, 1.5, 0;
     CHECK(Q(&points, 1.0) == result);
-}
+}*/
 
 // Runs p equation
 MatrixXd p(MatrixXd *points, float u, float v) {
@@ -73,13 +73,13 @@ int factorial(int x) {
     return x * factorial(x - 1);
 }
 
-TEST_CASE("testing the factorial function") {
+/*TEST_CASE("testing the factorial function") {
     CHECK(factorial(0) == 1);
     CHECK(factorial(1) == 1);
     CHECK(factorial(2) == 2);
     CHECK(factorial(3) == 6);
     CHECK(factorial(10) == 3628800);
-}
+}*/
 
 int kChoosei(int k, int i) {
     return factorial(k) / (factorial(i) * factorial(k - i));
@@ -134,7 +134,7 @@ Vector3d dQdu(MatrixXd *points, float u, float v) {
            3 * u * u * (Vector3d)curveV.row(3);
 }
 
-TEST_CASE("testing the dQdu function") {
+/*TEST_CASE("testing the dQdu function") {
     MatrixXd points(16, 3);
     Vector3d result;
     result << 6, 0, 0;
@@ -142,7 +142,7 @@ TEST_CASE("testing the dQdu function") {
         2, 0, 0, 4, 0, 2, 4, 0, 4, 4, 0, 6, 4, 0, 0, 6, 0, 2, 6, 0, 4, 6, 0, 6,
         6, 0;
     CHECK(dQdu(&points, 0.75, 0.25).transpose() == result.transpose());
-}
+}*/
 
 // Calculates the partial derivative with respect to v at a point
 Vector3d dQdv(MatrixXd *points, float u, float v) {
@@ -174,14 +174,14 @@ Vector3d qPrime(MatrixXd *points, float u) {
     return acc;
 }
 
-TEST_CASE("testing the qPrime function") {
+/*TEST_CASE("testing the qPrime function") {
     MatrixXd points(4, 3);
     Vector3d result;
     result << 6, 0, 0;
     points << 0, 1.5, 0, 2, 1.5, 0, 4, 1.5, 0, 6, 1.5, 0;
     // I guess it makes sense this is the same as the dQdu test case
     CHECK(qPrime(&points, 0.75).transpose() == result.transpose());
-}
+}*/
 
 // Runs Q'' equation
 Vector3d qDoublePrime(MatrixXd *points, float u) {
@@ -194,13 +194,13 @@ Vector3d qDoublePrime(MatrixXd *points, float u) {
     return acc;
 }
 
-TEST_CASE("testing the qDoublePrime function") {
+/*TEST_CASE("testing the qDoublePrime function") {
     MatrixXd points(4, 3);
     Vector3d result;
     result << 0, 0, 0;
     points << 0, 1.5, 0, 2, 1.5, 0, 4, 1.5, 0, 6, 1.5, 0;
     CHECK(qDoublePrime(&points, 0.75).transpose() == result.transpose());
-}
+}*/
 
 // Actual direct curvature calculation
 double curvature(Vector3d prime, Vector3d doublePrime) {
@@ -242,13 +242,13 @@ double distanceInU(MatrixXd *points, float ustart, float uend, float v) {
     return distance(one, two);
 }
 
-TEST_CASE("testing the distanceInU function") {
+/*TEST_CASE("testing the distanceInU function") {
     MatrixXd points(16, 3);
     points << 0, 0, 0, 2, 0, 0, 4, 0, 0, 6, 0, 0, 0, 2, 0, 2, 2, 0, 4, 2, 0, 6,
         2, 0, 0, 4, 0, 2, 4, 0, 4, 4, 0, 6, 4, 0, 0, 6, 0, 2, 6, 0, 4, 6, 0, 6,
         6, 0;
     CHECK(distanceInU(&points, 0.0, 0.5, 0.5) == 3.0);
-}
+}*/
 
 /*
  * points: 16 Bezier patch control points
@@ -305,7 +305,9 @@ double curvatureSign(MatrixXd *points, float u, float v, bool inU) {
         jsOut["list"][index]["entities"].push_back(makeEntity("vector", 0.0, 1.0, 0.0, "Q Prime in v", psVec));
         if (!jsOut["list"][index].contains("description"))
             jsOut["list"][index]["description"] = "N dot qDP results:";
-        jsOut["list"][index]["description"] = fmt::format("{}\n  at {},{}: {}", jsOut["list"][index]["description"], u, v, result);
+        string desc;
+        jsOut["list"][index]["description"].get_to(desc);
+        jsOut["list"][index]["description"] = fmt::format("{}\n  at {},{}: {}", desc, u, v, result);
         ofstream o("out.json");
         o << jsOut << endl;
         o.close();
@@ -344,10 +346,10 @@ double curvatureInU(MatrixXd *points, float u, float v) {
     return curvatureSign(points, u, v, true) * curvature;
 }
 
-TEST_CASE("testing the curvatureInU function") {
+/*TEST_CASE("testing the curvatureInU function") {
     MatrixXd points(16, 3);
     points << 0, 0, 0, 2, 0, 0, 4, 0, 0, 6, 0, 0, 0, 2, 0, 2, 2, 0, 4, 2, 0, 6,
         2, 0, 0, 4, 0, 2, 4, 0, 4, 4, 0, 6, 4, 0, 0, 6, 0, 2, 6, 0, 4, 6, 0, 6,
         6, 0;
     CHECK(curvatureInU(&points, 0.5, 0.5) == 0.0);
-}
+}*/

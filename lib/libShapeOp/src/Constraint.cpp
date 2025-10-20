@@ -12,6 +12,7 @@
 #include "Constraint.h"
 #include <cassert>
 #include <algorithm>
+#include <iostream>
 ///////////////////////////////////////////////////////////////////////////////
 #define SHAPEOP_INNER_ITERATIONS 4 //TODO: fix this
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,7 +28,8 @@ SHAPEOP_INLINE std::shared_ptr<Constraint> Constraint::shapeConstraintFactory(co
 
   std::size_t n = idI.size();
   std::shared_ptr<Constraint> c;
-  if (constraintType.compare("EdgeStrain") == 0) {        if (n != 2) { return c;} return std::make_shared<EdgeStrainConstraint>(idI, weight, positions); }
+  if (constraintType.compare("EdgeStrain") == 0) {        if (n != 2)  { return c;} return std::make_shared<EdgeStrainConstraint>(idI, weight, positions); }
+  if (constraintType.compare("HexPrismVolume") == 0) {    if (n != 12) { return c;} return std::make_shared<HexPrismVolumeConstraint>(idI, weight, positions); }
   if (constraintType.compare("TriangleStrain") == 0) {    if (n != 3) { return c; } return std::make_shared<TriangleStrainConstraint>(idI, weight, positions); }
   if (constraintType.compare("TetrahedronStrain") == 0) { if (n != 4) { return c; } return std::make_shared<TetrahedronStrainConstraint>(idI, weight, positions); }
   if (constraintType.compare("Area") == 0) {              if (n != 3) { return c; } return std::make_shared<AreaConstraint>(idI, weight, positions); }
@@ -80,11 +82,60 @@ SHAPEOP_INLINE void EdgeStrainConstraint::addConstraint(std::vector<Triplet> &tr
   idO_ = idO;
   triplets.push_back(Triplet(idO_, idI_[0], -weight_ * rest_));
   triplets.push_back(Triplet(idO_, idI_[1], weight_ * rest_));
+  //std::cout << -weight_ * rest_ << std::endl;
   idO += 1;
 }
 ///////////////////////////////////////////////////////////////////////////////
 SHAPEOP_INLINE void EdgeStrainConstraint::setEdgeLength(Scalar length) {
   rest_ = 1.0f / length;
+}
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+SHAPEOP_INLINE HexPrismVolumeConstraint::HexPrismVolumeConstraint(const std::vector<int> &idI,
+                                                  Scalar weight,
+                                                  const Matrix3X &positions,
+                                                  Scalar rangeMin,
+                                                  Scalar rangeMax) :
+  Constraint(idI, weight),
+  rangeMin_(rangeMin),
+  rangeMax_(rangeMax) {
+  assert(idI_.size() == 12);
+  //Matrix33 edges;
+  //for (int i = 0; i < 3; ++i) edges.col(i) = positions.col(idI_[i + 1]) - positions.col(idI_[0]);
+  //rest_ = edges.inverse();
+  //Scalar V = (edges).determinant() / 6.0f;
+  //weight_ *= std::sqrt(std::abs(V));
+}
+///////////////////////////////////////////////////////////////////////////////
+SHAPEOP_INLINE void HexPrismVolumeConstraint::project(const Matrix3X &positions, Matrix3X &projections) const {
+  /*Matrix33 edges;
+  for (int i = 0; i < 3; ++i) edges.col(i) = positions.col(idI_[i + 1]) - positions.col(idI_[0]);
+  Matrix33 F = edges * rest_;
+  Eigen::JacobiSVD<Matrix33> svd(F, Eigen::ComputeFullU | Eigen::ComputeFullV);
+  Vector3 S = svd.singularValues();
+  Vector3 d(0.0f, 0.0f, 0.0f);
+  for (int i = 0; i < SHAPEOP_INNER_ITERATIONS; ++i) {
+    Scalar v = S(0) * S(1) * S(2);
+    Scalar f = v - clamp(v, rangeMin_, rangeMax_);
+    Vector3 g(S(1)*S(2), S(0)*S(2), S(0)*S(1));
+    d = -((f - g.dot(d)) / g.dot(g)) * g;
+    S = svd.singularValues() + d;
+  }
+  if (svd.matrixU().determinant()*svd.matrixV().determinant() < 0.0f) S(2) = -S(2);
+  F = svd.matrixU() * S.asDiagonal() * svd.matrixV().transpose();
+  projections.block<3, 3>(0, idO_) = weight_ * F;*/
+}
+///////////////////////////////////////////////////////////////////////////////
+SHAPEOP_INLINE void HexPrismVolumeConstraint::addConstraint(std::vector<Triplet> &triplets, int &idO) const {
+  /*idO_ = idO;
+  int n = 3;
+  for (int i = 0; i < n; ++i) {
+    triplets.push_back(Triplet(idO_ + i, idI_[0], -weight_ * (rest_(0, i) + rest_(1, i) + rest_(2, i))));
+    triplets.push_back(Triplet(idO_ + i, idI_[1], weight_ * rest_(0, i)));
+    triplets.push_back(Triplet(idO_ + i, idI_[2], weight_ * rest_(1, i)));
+    triplets.push_back(Triplet(idO_ + i, idI_[3], weight_ * rest_(2, i)));
+  }
+  idO += n;*/
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -822,6 +873,8 @@ SHAPEOP_INLINE void AngleConstraint::project(const Matrix3X &positions, Matrix3X
 
   Vector3 v1 = positions.col(idI_[1]) - positions.col(idI_[0]),
           v2 = positions.col(idI_[2]) - positions.col(idI_[0]);
+  //std::cout << std::endl << v1 << std::endl << std::endl;
+  //std::cout << std::endl << v2 << std::endl << std::endl;
 
   projections.col(idO_) = v1;
   projections.col(idO_ + 1) = v2;
@@ -883,12 +936,12 @@ SHAPEOP_INLINE void AngleConstraint::addConstraint(std::vector<Triplet> &triplet
 SHAPEOP_INLINE void AngleConstraint::setMinAngle(Scalar minAngle) {
   // Ensure the angle limits are between 0 and PI
   // Use parentheses to avoid conflicts with the min/max macros from windows.h
-  minAngle_ = (std::max)(minAngle, 0.0);
+  minAngle_ = (std::max)(minAngle, static_cast<SHAPEOP_SCALAR>(0.0));
   minAngleCos_ = clamp(std::cos(minAngle_), -1.0, 1.0);
 }
 ///////////////////////////////////////////////////////////////////////////////
 SHAPEOP_INLINE void AngleConstraint::setMaxAngle(Scalar maxAngle) {
-  maxAngle_ = (std::min)(maxAngle, M_PI);
+  maxAngle_ = (std::min)(maxAngle, static_cast<SHAPEOP_SCALAR>(M_PI));
   maxAngleCos_ = clamp(std::cos(maxAngle_), -1.0, 1.0);
 }
 ///////////////////////////////////////////////////////////////////////////////

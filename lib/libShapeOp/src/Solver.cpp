@@ -14,14 +14,27 @@
 #include "Constraint.h"
 #include "Force.h"
 ///////////////////////////////////////////////////////////////////////////////
+//#ifdef SHAPEOP_OPENMP
+//#ifdef SHAPEOP_MSVC
+//#define SHAPEOP_OMP_PARALLEL __pragma(omp parallel)
+//#define SHAPEOP_OMP_FOR __pragma(omp for)
+//#else
+//#define SHAPEOP_OMP_PARALLEL _Pragma("omp parallel")
+//#define SHAPEOP_OMP_FOR _Pragma("omp for")
+//#endif
+//#else
 #define SHAPEOP_OMP_PARALLEL _Pragma("omp parallel")
 #define SHAPEOP_OMP_FOR _Pragma("omp for")
+//#endif
 ///////////////////////////////////////////////////////////////////////////////
 namespace ShapeOp {
 ///////////////////////////////////////////////////////////////////////////////
 SHAPEOP_INLINE int Solver::addConstraint(const std::shared_ptr<Constraint> &c) {
   constraints_.push_back(c);
   return static_cast<int>(constraints_.size() - 1);
+}
+SHAPEOP_INLINE void Solver::clearConstraints() {
+  constraints_.clear();
 }
 ///////////////////////////////////////////////////////////////////////////////
 SHAPEOP_INLINE std::shared_ptr<Constraint> &Solver::getConstraint(int id) {
@@ -112,7 +125,10 @@ SHAPEOP_INLINE bool Solver::solve(unsigned int iteration) {
       SHAPEOP_OMP_FOR for (int i = 0; i < 3; ++i)
         points_.row(i) = solver_->solve(At_ * projections_.row(i).transpose() + M_ * momentum_.row(i).transpose(), points_.row(i).transpose()).transpose(); //TODO: should At_ nd M_ be row major? Temporary variables?
     }
+    emit progress(it, iteration);
+    //std::cout << it << std::endl;
   }
+  emit progress(iteration, iteration);
   if (dynamic_) {
     SHAPEOP_OMP_PARALLEL
     {

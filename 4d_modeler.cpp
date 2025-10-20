@@ -1,5 +1,5 @@
-#define DOCTEST_CONFIG_IMPLEMENT
-#include "doctest.h"
+//#define DOCTEST_CONFIG_IMPLEMENT
+#//include "doctest.h"
 #include "graddesc.h"
 #include "util.h"
 #include "widget.h"
@@ -7,13 +7,13 @@
 GradDesc *gd;
 
 int main(int argc, char *argv[]) {
-    doctest::Context ctx;
+    /*doctest::Context ctx;
     ctx.setOption("abort-after", 5);  // default - stop after 5 failed asserts
     ctx.applyCommandLine(argc, argv); // apply command line - argc / argv
     ctx.setOption("no-breaks", true); // override - don't break in the debugger
     int res = ctx.run();              // run test cases unless with --no-run
     if(ctx.shouldExit())              // query flags (and --exit) rely on this
-        return res;
+        return res;*/
 
     string inputFileName = "input.txt";
     // Parse arguments

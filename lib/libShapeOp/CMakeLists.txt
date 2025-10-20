@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
 project(ShapeOp)
 
 set(CMAKE_CONFIGURATION_TYPES Release Debug CACHE TYPE INTERNAL FORCE)
@@ -8,8 +8,22 @@ option(OPENMP TRUE)
 # files in the folder where the current file is located
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
+# Qt
+if ((NOT DEFINED ENV{QT_VERSION_TO_USE}) OR ($ENV{QT_VERSION_TO_USE} STREQUAL 5))
+    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Widgets Gui Concurrent Multimedia)
+    find_package(Qt5Multimedia)
+elseif($ENV{QT_VERSION_TO_USE} STREQUAL 6)
+    find_package(Qt6 REQUIRED COMPONENTS Core Widgets Gui Concurrent Multimedia)
+    #find_package(Qt6Multimedia)
+else()
+    message( FATAL_ERROR "ERROR: Invalid QT_VERSION_TO_USE envar provided (must be 5 or 6)" )
+endif()
+qt_wrap_cpp(CXX_FILES Solver.h)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 # Find Eigen3
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 REQUIRED NO_MODULE)
 include_directories(${EIGEN3_INCLUDE_DIR})
 if(NOT EIGEN3_FOUND)
     message(ERROR " EIGEN not found.")
@@ -38,7 +52,7 @@ set_target_properties(ShapeOp PROPERTIES VERSION ${SHAPEOP_VERSION_STRING} SOVER
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
-    target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
+    target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Core Qt::Widgets Qt::Gui OpenMP::OpenMP_CXX Eigen3::Eigen)
 endif()
 
 # Rename executable to contain version number on windows. On mac, a so-chain is generated from the SOVERSION specified above.

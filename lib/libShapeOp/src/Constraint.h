@@ -114,6 +114,29 @@ class SHAPEOP_API EdgeStrainConstraint : public Constraint {
   Scalar rangeMax_;
 };
 ///////////////////////////////////////////////////////////////////////////////
+class SHAPEOP_API HexPrismVolumeConstraint : public Constraint {
+    public:
+        HexPrismVolumeConstraint(const std::vector<int> &idI,
+                Scalar weight,
+                const Matrix3X & positions,
+                Scalar rangeMin = 1.0,
+                Scalar rangeMax = 1.0);
+        virtual ~HexPrismVolumeConstraint() {}
+        /** \brief Find the closest configuration from the input positions that satisfy the constraint.*/
+        virtual void project(const Matrix3X &positions, Matrix3X &projections) const override final;
+        /** \brief Add the constraint to the linear system.*/
+        virtual void addConstraint(std::vector<Triplet> &triplets, int &idO) const override final;
+        /** \brief Set a new range minimum.*/
+        void setRangeMin(Scalar rMin) { rangeMin_ = rMin; }
+        /** \brief Set a new range maximum.*/
+        void setRangeMax(Scalar rMax) { rangeMax_ = rMax; }
+    private:
+        Matrix33 rest_;
+        Scalar rangeMin_;
+        Scalar rangeMax_;
+        mutable Matrix3X input;
+};
+///////////////////////////////////////////////////////////////////////////////
 /** \brief A mesh-independent triangle strain-limiting constraint. See \cite Bouaziz2014 for more details.*/
 class SHAPEOP_API TriangleStrainConstraint : public Constraint {
  public:
